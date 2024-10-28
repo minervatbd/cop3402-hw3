@@ -132,7 +132,7 @@ constDecl : constsym constDefList { $$ = ast_const_decl($2); } ;
 constDefList : constDef { $$ = ast_const_def_list_singleton($1); }
             | constDefList constDef { $$ = ast_const_def_list($1, $2); } ;
 
-constDef : ident eqsym number { $$ = ast_const_def($1, $3); } ;
+constDef : identsym eqsym numbersym { $$ = ast_const_def($1, $3); } ;
 
 
 varDecls : empty { $$ = ast_var_decls_empty($1); }
