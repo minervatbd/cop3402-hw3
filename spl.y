@@ -232,6 +232,29 @@ relOpCondition : expr relOp expr
 relOp : eqeqsym | neqsym | gtsym | geqsym | ltsym | leqsym ;
 
 
+expr :  term
+            | expr plussym term
+            { $$ = ast_expr_binary_op(ast_binary_op_expr($1, $2, $3)); }
+            | expr minussym term
+            { $$ = ast_expr_binary_op(ast_binary_op_expr($1, $2, $3)); } ;
+
+term : factor
+            | term multsym factor
+            { $$ = ast_expr_binary_op(ast_binary_op_expr($1, $2, $3)); }
+            | term divsym factor
+            { $$ = ast_expr_binary_op(ast_binary_op_expr($1, $2, $3)); } ;
+
+factor : identsym
+            { $$ = ast_expr_ident($1); }
+            | numbersym
+            { $$ = ast_expr_number($1); }
+            | sign factor
+            { $$ = ast_expr_signed_expr($1, $2); }
+            | lparensym expr rparensym
+            { $$ = $2; } ;
+
+sign : minussym | plussym;
+
 %%
 
 // Set the program's ast to be ast
