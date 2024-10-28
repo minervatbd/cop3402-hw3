@@ -150,6 +150,17 @@ procDecls : empty { $$ = ast_proc_decls_empty($1); }
 procDecl : procsym identsym block { $$ = ast_proc_decl($2, $3); } ;
 
 
+stmts : empty { $$ = ast_stmts_empty($1); }
+            | stmtList { $$ = ast_stmts($1); } ;
+
+empty : %empty
+            { file_location *file_loc
+            = file_location_make(lexer_filename(), lexer_line());
+            $$ = ast_empty(file_loc); } ;
+
+stmtList : stmt { $$ = ast_stmt_list_singleton($1); }
+            | stmtList semisym stmt { $$ = ast_stmt_list($1, $3); } ;
+
 %%
 
 // Set the program's ast to be ast
