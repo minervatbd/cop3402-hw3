@@ -161,6 +161,32 @@ empty : %empty
 stmtList : stmt { $$ = ast_stmt_list_singleton($1); }
             | stmtList semisym stmt { $$ = ast_stmt_list($1, $3); } ;
 
+stmt : assignStmt { $$ = ast_stmt_assign($1); }
+            | callStmt { $$ = ast_stmt_call($1); }
+            | ifStmt { $$ = ast_stmt_if($1); }
+            | whileStmt { $$ = ast_stmt_while($1); }
+            | readStmt { $$ = ast_stmt_read($1); }
+            | printStmt { $$ = ast_stmt_print($1); }
+            | blockStmt { $$ = ast_stmt_block($1); } ;
+
+assignStmt : identsym becomessym expr { $$ = ast_assign_stmt($1, $3); } ;
+
+callStmt : callsym identsym { $$ = ast_call_stmt($2); } ;
+
+ifStmt : ifsym condition thensym stmts elsesym stmts endsym
+            { $$ = ast_if_then_else_stmt($2, $4, $6); }
+            | ifsym condition thensym stmts endsym
+            { $$ = ast_if_then_stmt($2, $4); } ;
+
+whileStmt : whilesym condition dosym stmts endsym
+            { $$ = ast_while_stmt($2, $4); } ;
+
+readStmt : readsym identsym { $$ = ast_read_stmt($2); } ;
+
+printStmt : printsym expr { $$ = ast_print_stmt($2); } ;
+
+blockStmt : block { $$ = ast_block_stmt($1); } ;
+
 %%
 
 // Set the program's ast to be ast
