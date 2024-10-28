@@ -123,15 +123,22 @@ program : block "." { setProgAST($1); } ;
 block : beginsym constDecls varDecls procDecls stmts endsym
             { $$ = ast_block($1, $2, $3, $4, $5); } ;
 
+
 constDecls : empty { $$ = ast_const_decls_empty($1); }
             | constDecls constDecl { $$ = ast_const_decls($1, $2); } ;
 
-constDecl : constsym constDefList { $$ = ast_const_decl($1); } ;
+constDecl : constsym constDefList { $$ = ast_const_decl($2); } ;
 
 constDefList : constDef { $$ = ast_const_def_list_singleton($1); }
             | constDefList constDef { $$ = ast_const_def_list($1, $2); } ;
 
-constDef : ident eqsym number { $$ = ast_const_def($1, $2); } ;
+constDef : ident eqsym number { $$ = ast_const_def($1, $3); } ;
+
+
+varDecls : empty { $$ = ast_var_decls_empty($1); }
+            | varDecls varDecl { $$ = ast_var_decls($1, $2); };
+
+varDecl : varsym identList { $$ = ast_var_decl{$2}; };
 
 %%
 
