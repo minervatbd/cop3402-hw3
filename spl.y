@@ -136,9 +136,14 @@ constDef : identsym eqsym numbersym { $$ = ast_const_def($1, $3); } ;
 
 
 varDecls : empty { $$ = ast_var_decls_empty($1); }
-            | varDecls varDecl { $$ = ast_var_decls($1, $2); };
+            | varDecls varDecl { $$ = ast_var_decls($1, $2); } ;
 
-varDecl : varsym identList { $$ = ast_var_decl{$2}; };
+varDecl : varsym identList { $$ = ast_var_decl{$2}; } ;
+
+identList : identsym { $$ ast_ident_list_singleton($1); }
+            | identList identsym { $$ = ast_ident_list($1, $2); } ;
+
+
 
 %%
 
