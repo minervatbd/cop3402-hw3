@@ -217,6 +217,21 @@ printStmt : printsym expr
 blockStmt : block
             { $$ = ast_block_stmt($1); } ;
 
+
+condition : dbCondition
+            { $$ = ast_condition_db($1); }
+            | relOpCondition
+            { $$ = ast_condition_rel_op($1); } ;
+
+dbCondition : divisiblesym expr bysym expr
+            { $$ = ast_db_condition($2, $4); } ;
+
+relOpCondition : expr relOp expr
+            { $$ = ast_rel_op_condition($1, $2, $3); } ;
+
+relOp : eqeqsym | neqsym | gtsym | geqsym | ltsym | leqsym ;
+
+
 %%
 
 // Set the program's ast to be ast
