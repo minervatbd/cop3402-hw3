@@ -135,8 +135,8 @@ constDecl : constsym constDefList
 
 constDefList : constDef
             { $$ = ast_const_def_list_singleton($1); }
-            | constDefList constDef
-            { $$ = ast_const_def_list($1, $2); } ;
+            | constDefList commasym constDef
+            { $$ = ast_const_def_list($1, $3); } ;
 
 constDef : identsym eqsym numbersym
             { $$ = ast_const_def($1, $3); } ;
@@ -151,8 +151,8 @@ varDecl : varsym identList { $$ = ast_var_decl{$2}; } ;
 
 identList : identsym
             { $$ ast_ident_list_singleton($1); }
-            | identList identsym
-            { $$ = ast_ident_list($1, $2); } ;
+            | identList commasym identsym
+            { $$ = ast_ident_list($1, $3); } ;
 
 
 procDecls : empty
