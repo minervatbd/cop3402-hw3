@@ -130,7 +130,7 @@ constDecls :    empty
                 | constDecls constDecl
                 { $$ = ast_const_decls($1, $2); } ;
 
-constDecl :     constsym constDefList 
+constDecl :     constsym constDefList semisym
                 { $$ = ast_const_decl($2); } ;
 
 constDefList :  constDef
@@ -144,7 +144,7 @@ constDef :      identsym eqsym numbersym
 
 varDecls :      empty
                 { $$ = ast_var_decls_empty($1); }
-                | varDecls varDecl
+                | varDecls varDecl semisym
                 { $$ = ast_var_decls($1, $2); } ;
 
 varDecl :       varsym identList
@@ -161,7 +161,7 @@ procDecls :     empty
                 | procDecls procDecl
                 { $$ = ast_proc_decls($1, $2); } ;
 
-procDecl :      procsym identsym block
+procDecl :      procsym identsym block semisym
                 { $$ = ast_proc_decl($2, $3); } ;
 
 
