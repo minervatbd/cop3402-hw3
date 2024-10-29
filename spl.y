@@ -151,7 +151,7 @@ varDecl :       varsym identList
                 { $$ = ast_var_decl{$2}; } ;
 
 identList :     identsym
-                { $$ ast_ident_list_singleton($1); }
+                { $$ = ast_ident_list_singleton($1); }
                 | identList commasym identsym
                 { $$ = ast_ident_list($1, $3); } ;
 
