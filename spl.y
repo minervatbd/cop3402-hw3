@@ -148,7 +148,7 @@ varDecls :      empty
                 { $$ = ast_var_decls($1, $2); } ;
 
 varDecl :       varsym identList
-                { $$ = ast_var_decl{$2}; } ;
+                { $$ = ast_var_decl($2); } ;
 
 identList :     identsym
                 { $$ = ast_ident_list_singleton($1); }
