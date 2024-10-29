@@ -249,7 +249,7 @@ factor :        identsym
                 { $$ = ast_expr_ident($1); }
                 | numbersym
                 { $$ = ast_expr_number($1); }
-                | sign factor
+                | minussym factor
                 { $$ = ast_expr_signed_expr($1, $2); }
                 | lparensym expr rparensym
                 { $$ = $2; } ;
