@@ -1,7 +1,6 @@
 #ifndef _SYMTAB_H
 #define _SYMTAB_H
 
-
 #define SCOPE_MAX 999
 #define TBL_MAX 999
 
@@ -19,11 +18,23 @@ typedef struct SymbolTable{
     SymAttributes map[TBL_MAX];
 };
 
-typedef struct ScopeStack{
+typedef struct ScopeStack{  
     int top;
     SymbolTable stack[SCOPE_MAX];
 };
 
+//check if current scope (Symbol Table) is full/empty
+bool isEmpty();
+bool isFull();
+
+//pop/push operations for scope stack
+void enterScope();
+void exitScope();
+
+//add a symbol to the table
+void insert(char* tok, SymAttributes el);
+//lookup a symbol
+SymAttributes* lookup(char* tok);
 
 #endif
 
