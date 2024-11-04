@@ -6,22 +6,22 @@
 
 enum types {VAR, CONST};
 
-typedef struct SymAttributes{
+typedef struct{
     char* fileName;
     int lineNum;
     enum types type;
     int AR_Offest;
-}
+} SymAttributes;
 
-typedef struct SymbolTable{
+typedef struct{
     int levelsOut;
     SymAttributes map[TBL_MAX];
-};
+} SymbolTable;
 
-typedef struct ScopeStack{  
+typedef struct{  
     int top;
     SymbolTable stack[SCOPE_MAX];
-};
+} ScopeStack;
 
 //check if current scope (Symbol Table) is full/empty
 bool isEmpty(ScopeStack* stack);
