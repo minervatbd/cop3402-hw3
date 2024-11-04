@@ -24,17 +24,20 @@ typedef struct ScopeStack{
 };
 
 //check if current scope (Symbol Table) is full/empty
-bool isEmpty();
-bool isFull();
+bool isEmpty(ScopeStack* stack);
+bool isFull(ScopeStack* stack);
 
 //pop/push operations for scope stack
-void enterScope();
-void exitScope();
+void enterScope(ScopeStack* stack);
+void exitScope(ScopeStack* stack);
 
 //add a symbol to the table
-void insert(char* tok, SymAttributes el);
+void insert(ScopeStack* stack, char* tok, SymAttributes el);
 //lookup a symbol
-SymAttributes* lookup(char* tok);
+SymAttributes* lookup(ScopeStack* stack, char* tok);
+
+//hash function
+int hash(char* tok);
 
 #endif
 
