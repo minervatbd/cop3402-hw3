@@ -120,12 +120,12 @@ void scope_check_constIdents(const_def_list_t cdl, AST_type t) {
 // Return the modified AST with id_use pointers
 stmts_t scope_check_stmt(stmts_t stmt)
 {
-    /*if(stmt.stmts_kind == empty_stmts_e) {
+    if(stmt.stmts_kind == empty_stmts_e) {
         return stmt;
-    }*/
+    }
     struct stmt_s *stmts = stmt.stmt_list.start;
-     while (stmts != NULL) {
-        //scope_check_stmt(stmts_t stmt)
+    while (stmts != NULL) {
+        
     switch (stmts->stmt_kind) {
     case assign_stmt:
         stmts->data.assign_stmt = scope_check_assignStmt(stmts->data.assign_stmt);
@@ -153,8 +153,8 @@ stmts_t scope_check_stmt(stmts_t stmt)
         break;
     }
         stmts = stmts->next;
-
-     }
+        fprintf(stdout, "\n");
+    }
     
     return stmt;
 }
@@ -198,10 +198,12 @@ if_stmt_t scope_check_ifStmt(if_stmt_t stmt)
         default:
             break;
     }
-    // FIXME 
+    
     *(stmt.then_stmts) = scope_check_stmt(*(stmt.then_stmts));
-    *(stmt.else_stmts) = scope_check_stmt(*(stmt.else_stmts));
+    if(stmt.else_stmts != NULL) {
+        *(stmt.else_stmts) = scope_check_stmt(*(stmt.else_stmts));
 
+    }
     return stmt;
 }
 
@@ -286,6 +288,7 @@ expr_t scope_check_expr(expr_t exp)
             break;
         case expr_number:
             // FIXME
+            // exp.data.number = exp;
             break;
         case expr_negated:
             *(exp.data.negated.expr) = scope_check_expr(*(exp.data.negated.expr));
