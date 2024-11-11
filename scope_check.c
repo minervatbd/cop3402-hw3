@@ -19,7 +19,7 @@ block_t scope_check_program(block_t ast)
     scope_check_constDecls(ast.const_decls);
     scope_check_varDecls(ast.var_decls);
     // FIXME
-    //scope_check_procDecls(ast.proc_decls);
+    scope_check_procDecls(ast.proc_decls);
     // need to update stmt's AST with id_use structs
     ast.stmts = scope_check_stmt(ast.stmts);
     symtab_leave_scope();
@@ -65,46 +65,18 @@ void scope_check_declare_ident(ident_t id, AST_type t)
     //const char *c = kind2str(t);
     //fprintf(stdout, "%s \n", c);
     if (symtab_declared_in_current_scope(id.name)) {
-        // DEBUG
-        //bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
-        switch(t) {
-            case const_decl_ast:
-                bail_with_prog_error(*(id.file_loc), "constant \"%s\" is already declared as a constant", id.name);
-                break;
-            case var_decl_ast:
-                id_use *type = symtab_lookup(id.name);
-                id_kind k = type->attrs->kind;
-                // DEBUG
-                //const char *c = kind2str(k);
-                //fprintf(stdout, "kind: %s \n", c);
-                switch(k) {
-                  case constant_idk:
-                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
-                    break;
-                  default:
-                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
-                    break;
-                }
-                
-                /*if (type->attrs == constant_idk) {
-                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
-                } else{
-                bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
-                }*/
-                
-                break;
-            default:
-              bail_with_error("Call to scope_check_declare_ident with invalid ident type");
-              break;
+        id_use *test = symtab_lookup(id.name);
+        if(test->attrs->kind == constant_idk){
+            bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
         }
+        else{
+            bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
+        }     
     } 
     else {
         int ofst_cnt = symtab_scope_loc_count();
         id_attrs *attrs = create_id_attrs(*(id.file_loc), t, ofst_cnt);
         symtab_insert(id.name, attrs);
-        //DEBUG
-        //id_use *test = symtab_lookup(id.name);
-        //fprintf(stdout, "%d \n", test->attrs->kind);
     }
 }
 
@@ -127,23 +99,66 @@ void scope_check_constIdents(const_def_list_t ids, AST_type t) {
     const_def_t *idp = ids.start;
     //ident_t idp = ids.start->ident;
     while (idp != NULL) {
-        scope_check_declare_ident(idp->ident, t);
+        scope_check_declare_constIdent(idp->ident, t);
         idp = idp->next;
         //id = cdt->ident;
     }
 }
 
+void scope_check_declare_constIdent(ident_t id, AST_type t) {
+    if (symtab_declared_in_current_scope(id.name)) {
+        bail_with_prog_error(*(id.file_loc), "constant \"%s\" is already declared as a constant", id.name);    }
+    else {
+        int ofst_cnt = symtab_scope_loc_count();
+        id_attrs *attrs = create_id_attrs(*(id.file_loc), t, ofst_cnt);
+        symtab_insert(id.name, attrs);
+    }
+}
+
 // build the symbol table and check the procedures in pds
-/*void scope_check_procDecls(proc_decls_t pds)
+void scope_check_procDecls(proc_decls_t pds)
 {
     proc_decl_t *pdp = pds.proc_decls;
     while (pdp != NULL) {
         //FIXME
-        scope_check_procDecl(*pdp);
+        scope_check_declare_procIdent(*pdp, pdp->type_tag);
         pdp = pdp->next;
+    }
+}
+
+// Add declarations for the names in vd,
+// reporting duplicate declarations
+/*void scope_check_procDecl(proc_decl_t pd)
+{
+    proc_decl_t *id = pd;
+    while (id != NULL) {
+        scope_check_declare_procIdent(ids, t);
+        idp = idp->next;
+    }
+    scope_check_procIdents(pd, pd.type_tag);
+}
+
+void scope_check_procIdents(proc_decl_t ids, AST_type t)
+{
+    //ident_t *idp = ids.start;
+    proc_decl_t *id = *ids;
+    while (id != NULL) {
+        scope_check_declare_procIdent(ids, t);
+        idp = idp->next;
     }
 }*/
 
+void scope_check_declare_procIdent(proc_decl_t id, AST_type t)
+{
+    if (symtab_declared_in_current_scope(id.name)) {
+        bail_with_prog_error(*(id.file_loc), "procedure \"%s\" is already declared as a procedure", id.name);
+    }
+    else {
+        int ofst_cnt = symtab_scope_loc_count();
+        id_attrs *attrs = create_id_attrs(*(id.file_loc), t, ofst_cnt);
+        symtab_insert(id.name, attrs);
+    }
+}
 
 // check the statement to make sure that
 // all idenfifiers used have been declared
