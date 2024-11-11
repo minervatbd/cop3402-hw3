@@ -16,7 +16,7 @@
 block_t scope_check_program(block_t ast)
 {
     symtab_enter_scope();
-    //scope_check_constDecls(ast.const_decls);
+    scope_check_constDecls(ast.const_decls);
     scope_check_varDecls(ast.var_decls);
     // FIXME
     //scope_check_procDecls(ast.proc_decls);
@@ -62,10 +62,41 @@ void scope_check_idents(ident_list_t ids, AST_type t)
 void scope_check_declare_ident(ident_t id, AST_type t)
 {
     //DEBUG
-    //fprintf(stdout, "%s \n", id.name);
-
+    //const char *c = kind2str(t);
+    //fprintf(stdout, "%s \n", c);
     if (symtab_declared_in_current_scope(id.name)) {
-        bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
+        // DEBUG
+        //bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
+        switch(t) {
+            case const_decl_ast:
+                bail_with_prog_error(*(id.file_loc), "constant \"%s\" is already declared as a constant", id.name);
+                break;
+            case var_decl_ast:
+                id_use *type = symtab_lookup(id.name);
+                id_kind k = type->attrs->kind;
+                // DEBUG
+                //const char *c = kind2str(k);
+                //fprintf(stdout, "kind: %s \n", c);
+                switch(k) {
+                  case constant_idk:
+                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
+                    break;
+                  default:
+                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
+                    break;
+                }
+                
+                /*if (type->attrs == constant_idk) {
+                    bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
+                } else{
+                bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a variable", id.name);
+                }*/
+                
+                break;
+            default:
+              bail_with_error("Call to scope_check_declare_ident with invalid ident type");
+              break;
+        }
     } 
     else {
         int ofst_cnt = symtab_scope_loc_count();
@@ -89,16 +120,16 @@ void scope_check_constDecls(const_decls_t cds)
 
 void scope_check_constDecl(const_decl_t cd)
 {
-    //scope_check_constIdents(cd.const_def_list, cd.type_tag);
+    scope_check_constIdents(cd.const_def_list, cd.type_tag);
 }
 
-void scope_check_constIdents(const_def_list_t cdl, AST_type t) {
-    const_def_t *cdt = cdl.start;
-    ident_t id = cdt->ident;
-    while (cdt != NULL) {
-        scope_check_declare_ident(id, t);
-        cdt = cdt->next;
-        id = cdt->ident;
+void scope_check_constIdents(const_def_list_t ids, AST_type t) {
+    const_def_t *idp = ids.start;
+    //ident_t idp = ids.start->ident;
+    while (idp != NULL) {
+        scope_check_declare_ident(idp->ident, t);
+        idp = idp->next;
+        //id = cdt->ident;
     }
 }
 
