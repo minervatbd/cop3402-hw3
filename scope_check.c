@@ -193,6 +193,8 @@ assign_stmt_t scope_check_assignStmt(assign_stmt_t stmt)
 call_stmt_t scope_check_callStmt(call_stmt_t stmt)
 {
     id_use *idu = scope_check_ident_declared(*(stmt.file_loc), stmt.name);
+//resolves eustis warning
+    free(idu);
     return stmt;
 }
 
@@ -230,6 +232,7 @@ if_stmt_t scope_check_ifStmt(if_stmt_t stmt)
 read_stmt_t scope_check_readStmt(read_stmt_t stmt)
 {
     id_use *idu = scope_check_ident_declared(*(stmt.file_loc), stmt.name);
+    free(idu);
     return stmt;
 }
 
@@ -296,7 +299,7 @@ expr_t scope_check_expr(expr_t exp)
             exp.data.ident = scope_check_ident_expr(exp.data.ident);
             break;
         case expr_number:
-            // FIXME
+            // no operation 
             break;
         case expr_negated:
             *(exp.data.negated.expr) = scope_check_expr(*(exp.data.negated.expr));
@@ -325,5 +328,6 @@ binary_op_expr_t scope_check_binary_op_expr(binary_op_expr_t exp)
 ident_t scope_check_ident_expr(ident_t id)
 {
     id_use *idu = scope_check_ident_declared(*(id.file_loc), id.name);
+    free(idu);
     return id;
 }

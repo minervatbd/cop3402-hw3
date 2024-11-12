@@ -254,8 +254,6 @@ factor :        identsym
                 | lparensym expr rparensym
                 { $$ = $2; } ;
 
-sign :          minussym | plussym;
-
 %%
 
 // Set the program's ast to be ast
