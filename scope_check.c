@@ -40,14 +40,14 @@ void scope_check_varDecls(var_decls_t vds)
 // reporting duplicate declarations
 void scope_check_varDecl(var_decl_t vd)
 {
-    //ident_t vDec = vd.ident_list.start;
-    scope_check_idents(vd.ident_list, vd.type_tag);
+    id_kind type = 1;
+    scope_check_idents(vd.ident_list, type);
 }
 
 // Add declarations for the names in ids
 // to current scope as type t
 // reporting any duplicate declarations
-void scope_check_idents(ident_list_t ids, AST_type t)
+void scope_check_idents(ident_list_t ids, id_kind t)
 {
     ident_t *idp = ids.start;
     while (idp != NULL) {
@@ -59,13 +59,14 @@ void scope_check_idents(ident_list_t ids, AST_type t)
 // Add declaration for id
 // to current scope as type t
 // reporting if it's a duplicate declaration
-void scope_check_declare_ident(ident_t id, AST_type t)
+void scope_check_declare_ident(ident_t id, id_kind t)
 {
     //DEBUG
     //const char *c = kind2str(t);
     //fprintf(stdout, "%s \n", c);
     if (symtab_declared_in_current_scope(id.name)) {
         id_use *test = symtab_lookup(id.name);
+        //fprintf(stdout, "kind %s"); 
         if(test->attrs->kind == constant_idk){
             bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
         }
@@ -92,10 +93,11 @@ void scope_check_constDecls(const_decls_t cds)
 
 void scope_check_constDecl(const_decl_t cd)
 {
-    scope_check_constIdents(cd.const_def_list, cd.type_tag);
+    id_kind type = 0;
+    scope_check_constIdents(cd.const_def_list, type);
 }
 
-void scope_check_constIdents(const_def_list_t ids, AST_type t) {
+void scope_check_constIdents(const_def_list_t ids, id_kind t) {
     const_def_t *idp = ids.start;
     //ident_t idp = ids.start->ident;
     while (idp != NULL) {
@@ -105,7 +107,7 @@ void scope_check_constIdents(const_def_list_t ids, AST_type t) {
     }
 }
 
-void scope_check_declare_constIdent(ident_t id, AST_type t) {
+void scope_check_declare_constIdent(ident_t id, id_kind t) {
     if (symtab_declared_in_current_scope(id.name)) {
         bail_with_prog_error(*(id.file_loc), "constant \"%s\" is already declared as a constant", id.name);    }
     else {
@@ -148,7 +150,7 @@ void scope_check_procIdents(proc_decl_t ids, AST_type t)
     }
 }*/
 
-void scope_check_declare_procIdent(proc_decl_t id, AST_type t)
+void scope_check_declare_procIdent(proc_decl_t id, id_kind t)
 {
     if (symtab_declared_in_current_scope(id.name)) {
         bail_with_prog_error(*(id.file_loc), "procedure \"%s\" is already declared as a procedure", id.name);
@@ -199,7 +201,7 @@ stmts_t scope_check_stmt(stmts_t stmt)
         break;
     }
         stmts = stmts->next;
-        fprintf(stdout, "\n");
+        //fprintf(stdout, "\n");
     }
     
     return stmt;
