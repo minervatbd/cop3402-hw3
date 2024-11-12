@@ -7,6 +7,7 @@
 enum types {VAR, CONST};
 
 typedef struct{
+    int occupied;
     char* fileName;
     int lineNum;
     enum types type;
@@ -14,7 +15,7 @@ typedef struct{
 } SymAttributes;
 
 typedef struct{
-    int levelsOut;
+    int levelsIn;
     SymAttributes map[TBL_MAX];
 } SymbolTable;
 
@@ -24,20 +25,23 @@ typedef struct{
 } ScopeStack;
 
 //check if current scope (Symbol Table) is full/empty
-bool isEmpty(ScopeStack* stack);
-bool isFull(ScopeStack* stack);
+bool isEmpty(ScopeStack* scope);
+bool isFull(ScopeStack* scope);
 
 //pop/push operations for scope stack
-void enterScope(ScopeStack* stack);
-void exitScope(ScopeStack* stack);
+void enterScope(ScopeStack* scope);
+void exitScope(ScopeStack* scope);
 
 //add a symbol to the table
-void insert(ScopeStack* stack, char* tok, SymAttributes el);
+void insert(ScopeStack* scope, char* symb, SymAttributes el);
 //lookup a symbol
-SymAttributes* lookup(ScopeStack* stack, char* tok);
+SymAttributes* lookup(ScopeStack* scope, char* symb);
 
 //hash function
-int hash(char* tok);
+int hash(char* symb);
+
+//constructors
+SymbolTable createSymTab(int levelsIn);
 
 #endif
 
