@@ -18,7 +18,6 @@ block_t scope_check_program(block_t ast)
     symtab_enter_scope();
     scope_check_constDecls(ast.const_decls);
     scope_check_varDecls(ast.var_decls);
-    // FIXME
     scope_check_procDecls(ast.proc_decls);
     // need to update stmt's AST with id_use structs
     ast.stmts = scope_check_stmt(ast.stmts);
@@ -61,13 +60,9 @@ void scope_check_idents(ident_list_t ids, id_kind t)
 // reporting if it's a duplicate declaration
 void scope_check_declare_ident(ident_t id, id_kind t)
 {
-    //DEBUG
-    //const char *c = kind2str(t);
-    //fprintf(stdout, "%s \n", c);
     if (symtab_declared_in_current_scope(id.name)) {
         id_use *test = symtab_lookup(id.name);
-        //fprintf(stdout, "kind %s"); 
-        if(test->attrs->kind == constant_idk){
+        if(test->attrs->kind == constant_idk) {
             bail_with_prog_error(*(id.file_loc), "variable \"%s\" is already declared as a constant", id.name);
         }
         else{
@@ -99,11 +94,10 @@ void scope_check_constDecl(const_decl_t cd)
 
 void scope_check_constIdents(const_def_list_t ids, id_kind t) {
     const_def_t *idp = ids.start;
-    //ident_t idp = ids.start->ident;
+
     while (idp != NULL) {
         scope_check_declare_constIdent(idp->ident, t);
         idp = idp->next;
-        //id = cdt->ident;
     }
 }
 
@@ -120,35 +114,13 @@ void scope_check_declare_constIdent(ident_t id, id_kind t) {
 // build the symbol table and check the procedures in pds
 void scope_check_procDecls(proc_decls_t pds)
 {
+    id_kind type = 2;
     proc_decl_t *pdp = pds.proc_decls;
     while (pdp != NULL) {
-        //FIXME
-        scope_check_declare_procIdent(*pdp, pdp->type_tag);
+        scope_check_declare_procIdent(*pdp, type);
         pdp = pdp->next;
     }
 }
-
-// Add declarations for the names in vd,
-// reporting duplicate declarations
-/*void scope_check_procDecl(proc_decl_t pd)
-{
-    proc_decl_t *id = pd;
-    while (id != NULL) {
-        scope_check_declare_procIdent(ids, t);
-        idp = idp->next;
-    }
-    scope_check_procIdents(pd, pd.type_tag);
-}
-
-void scope_check_procIdents(proc_decl_t ids, AST_type t)
-{
-    //ident_t *idp = ids.start;
-    proc_decl_t *id = *ids;
-    while (id != NULL) {
-        scope_check_declare_procIdent(ids, t);
-        idp = idp->next;
-    }
-}*/
 
 void scope_check_declare_procIdent(proc_decl_t id, id_kind t)
 {
@@ -201,7 +173,6 @@ stmts_t scope_check_stmt(stmts_t stmt)
         break;
     }
         stmts = stmts->next;
-        //fprintf(stdout, "\n");
     }
     
     return stmt;
@@ -213,15 +184,12 @@ stmts_t scope_check_stmt(stmts_t stmt)
 assign_stmt_t scope_check_assignStmt(assign_stmt_t stmt)
 {
     const char *name = stmt.name;
-    // DEBUG
-    // fprintf(stdout, "%s\n", name);
     id_use *idu = scope_check_ident_declared(*(stmt.file_loc), name);
-    assert(idu != NULL);  // since would bail if not declared
+    assert(idu != NULL); 
     *stmt.expr = scope_check_expr(*(stmt.expr));
     return stmt;
 }
 
-// FIXME maybe
 call_stmt_t scope_check_callStmt(call_stmt_t stmt)
 {
     id_use *idu = scope_check_ident_declared(*(stmt.file_loc), stmt.name);
@@ -261,8 +229,6 @@ if_stmt_t scope_check_ifStmt(if_stmt_t stmt)
 // Return the modified AST with id_use pointers
 read_stmt_t scope_check_readStmt(read_stmt_t stmt)
 {
-    // DEBUG
-    // fprintf(stdout, "read\n");
     id_use *idu = scope_check_ident_declared(*(stmt.file_loc), stmt.name);
     return stmt;
 }
@@ -297,7 +263,6 @@ while_stmt_t scope_check_whileStmt(while_stmt_t stmt)
     return stmt;
 }
 
-// FIXME
 block_stmt_t scope_check_blockStmt(block_stmt_t stmt)
 {
     *(stmt.block) = scope_check_program(*(stmt.block));
@@ -309,14 +274,10 @@ block_stmt_t scope_check_blockStmt(block_stmt_t stmt)
 // otherwise, produce an error 
 id_use *scope_check_ident_declared(file_location floc, const char *name)
 {
-    // DEBUG
-    // fprintf(stdout, "%s\n", name);
     id_use *ret = symtab_lookup(name);
     if (ret == NULL) {
 	    bail_with_prog_error(floc, "identifier \"%s\" is not declared!", name);
     }
-    //FIXME
-    //scope_lookup
     assert(ret->attrs != NULL);
     return ret;
 }
@@ -336,7 +297,6 @@ expr_t scope_check_expr(expr_t exp)
             break;
         case expr_number:
             // FIXME
-            // exp.data.number = exp;
             break;
         case expr_negated:
             *(exp.data.negated.expr) = scope_check_expr(*(exp.data.negated.expr));
@@ -355,7 +315,6 @@ expr_t scope_check_expr(expr_t exp)
 binary_op_expr_t scope_check_binary_op_expr(binary_op_expr_t exp)
 {
     *(exp.expr1) = scope_check_expr(*(exp.expr1));
-    // (note: no identifiers can occur in the operator)
     *(exp.expr2) = scope_check_expr(*(exp.expr2));
     return exp;
 }
