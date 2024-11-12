@@ -13,7 +13,9 @@ extern void scope_check_constDecls(const_decls_t cds);
 
 extern void scope_check_constDecl(const_decl_t cd);
 
-extern void scope_check_constIdents(const_def_list_t ids, AST_type t);
+extern void scope_check_constIdents(const_def_list_t ids, id_kind t);
+
+extern void scope_check_declare_constIdent(ident_t id, id_kind t);
 
 extern void scope_check_varDecls(var_decls_t vds);
 
@@ -22,7 +24,12 @@ extern void scope_check_varDecl(var_decl_t vd);
 // Add declarations for the names in ids to the current scope's symbol table,
 // for variables of the type t,
 // producing errors for any duplicate declarations
-extern void scope_check_idents(ident_list_t ids, AST_type t);
+extern void scope_check_idents(ident_list_t ids, id_kind t);
+
+// Add a declaration of the name id.name with the type t
+// to the current scope's symbol table,
+// producing an error if this would be a duplicate declaration
+extern void scope_check_declare_ident(ident_t id, id_kind t);
 
 extern void scope_check_procDecls(proc_decls_t pds);
 
@@ -30,12 +37,7 @@ extern void scope_check_procDecls(proc_decls_t pds);
 
 //extern void scope_check_procIdents(proc_decl_t pd, AST_type t);
 
-extern void scope_check_declare_procIdent(proc_decl_t id, AST_type t);
-
-// Add a declaration of the name id.name with the type t
-// to the current scope's symbol table,
-// producing an error if this would be a duplicate declaration
-extern void scope_check_declare_ident(ident_t id, AST_type t);
+extern void scope_check_declare_procIdent(proc_decl_t id, id_kind t);
 
 // check the statement to make sure that
 // all idenfifiers referenced in it have been declared
