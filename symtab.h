@@ -1,48 +1,69 @@
 #ifndef _SYMTAB_H
 #define _SYMTAB_H
 
-#define SCOPE_MAX 999
-#define TBL_MAX 999
+#include "scope.h"
+#include "id_use.h"
 
-enum types {VAR, CONST};
+// Maximum nesting of potential scopes
+#define MAX_NESTING 100
 
-typedef struct{
-    int occupied;
-    char* fileName;
-    int lineNum;
-    enum types type;
-    int AR_Offest;
-} SymAttributes;
+// initialize the symbol table
+extern void symtab_initialize();
 
-typedef struct{
-    int levelsIn;
-    SymAttributes map[TBL_MAX];
-} SymbolTable;
+// Return the number of scopes currently in the symbol table.
+extern unsigned int symtab_size();
 
-typedef struct{  
-    int top;
-    SymbolTable stack[SCOPE_MAX];
-} ScopeStack;
+// Does this symbol table have any scopes in it?
+extern bool symtab_empty();
 
-//check if current scope (Symbol Table) is full/empty
-bool isEmpty(ScopeStack* scope);
-bool isFull(ScopeStack* scope);
+// Return the current scope's
+// count of variables declared
+extern unsigned int symtab_scope_loc_count();
 
-//pop/push operations for scope stack
-void enterScope(ScopeStack* scope);
-void exitScope(ScopeStack* scope);
+// Return the current scope's size
+// (the number of declared ids).
+extern unsigned int symtab_scope_size();
 
-//add a symbol to the table
-void insert(ScopeStack* scope, char* symb, SymAttributes el);
-//lookup a symbol
-SymAttributes* lookup(ScopeStack* scope, char* symb);
+// Is the current scope full?
+extern bool symtab_scope_full();
 
-//hash function
-int hash(char* symb);
+// Return the current nesting level 
+// (num. of symtab_enter_scope() calls
+//  - num. of symtab_leave_scope() calls
+extern unsigned int
+   symtab_current_nesting_level();
 
-//constructors
-SymbolTable createSymTab(int levelsIn);
+// Is the symbol table itself full?
+extern bool symtab_full();
+
+// Is name declared?
+// (this looks back through all scopes)
+extern bool symtab_declared(const char *name);
+
+// Is name declared in the current scope?
+// (this only looks in the current scope)
+extern bool
+         symtab_declared_in_current_scope(
+		        const char *name);
+
+// Requires: attrs != NULL &&
+// !symtab_declared_in_current_scope(name)
+// Add an association from the given name
+// to the given attributes
+extern void symtab_insert(
+       const char *name, id_attrs *attrs);
+
+// Requires: !symtab_full()
+// Start a new scope (for a block)
+extern void symtab_enter_scope();
+
+// Requires: !symtab_empty()
+extern void symtab_leave_scope();
+
+// If name is declared, return
+// an id_use pointer for it, otherwise
+// return NULL if name isn't declared
+extern id_use *symtab_lookup(
+                       const char *name);
 
 #endif
-
- 
